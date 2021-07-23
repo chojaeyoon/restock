@@ -14,8 +14,10 @@ class StockCheck: # StockCheck 클래스가 스크래핑 부분을 담당
         # TODO Pass parameters def getResponse(self, params):
         # TODO Add some error handling
         URL = self.url
-        
-        return requests.get(URL)
+        headers = {
+            "User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.277 Whale/2.9.118.38 Safari/537.36"
+        }
+        return requests.get(URL, headers = headers)
 
 
     def check(self): # 가장 중요한 부분으로 getResponse 실행을 통해 응답을 가져오고 결과를 리턴
@@ -31,9 +33,9 @@ class StockCheck: # StockCheck 클래스가 스크래핑 부분을 담당
 
         if (self.last_status != status):
             self.last_status = status
-            return (True, not(self.last_status), self.last_status, self)
+            return (True, not(self.last_status), self.last_status)
         
-        return (False, self.last_status, status, self)
+        return (False, self.last_status, status)
 
 
     def __str__(self): # 클래스의 기본 함수를 오버라이딩 한 부분, 로그 등을 출력할 때 보기 쉽게 만들기 위함.
@@ -41,11 +43,11 @@ class StockCheck: # StockCheck 클래스가 스크래핑 부분을 담당
 
 
 if __name__ == "__main__": # 테스트 코드
-    def cjCheck(res):
+    def coupangCheck(res):
         from bs4 import BeautifulSoup
         
         soup = BeautifulSoup(res.text, 'html.parser')
-        stock_div = soup.find("a", class_= "_buy")
+        stock_div = soup.find('div', class_='prod-not-find-known__buy__button')
 
         if stock_div == None:
             return True
@@ -54,16 +56,16 @@ if __name__ == "__main__": # 테스트 코드
 
         import re # 정규표현식 내장함수
 
-        p = re.compile('매진')
+        p = re.compile('품절')
         m = p.search(stock_result)
 
         return True if m == None else False
 
 
-    lego_friends_perk = StockCheck("Friends Central Perk"
-        , "https://www.lego.com/ko-kr/product/central-perk-21319"
-        , cjCheck, "utf-8")
-    stock = lego_friends_perk.check()
-    print(lego_friends_perk.name, "Available? ", stock)
-    (status_changed, last_status, current_status) = lego_friends_perk.statusChanged()
-    print(lego_friends_perk.name, "Status Changed? ", status_changed, ", Last Status? ", last_status, ", Current Status? ", current_status)
+    coupang = StockCheck("Q92"
+        , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
+        , coupangCheck, "utf-8")
+    stock = coupang.check()
+    print(coupang.name, "Available? ", stock)
+    (status_changed, last_status, current_status) = coupang.statusChanged()
+    print(coupang.name, "Status Changed? ", status_changed, ", Last Status? ", last_status, ", Current Status? ", current_status)
