@@ -33,9 +33,9 @@ class StockCheck: # StockCheck 클래스가 스크래핑 부분을 담당
 
         if (self.last_status != status):
             self.last_status = status
-            return (True, not(self.last_status), self.last_status)
+            return (True, not(self.last_status), self.last_status, self)
         
-        return (False, self.last_status, status)
+        return (False, self.last_status, status, self)
 
 
     def __str__(self): # 클래스의 기본 함수를 오버라이딩 한 부분, 로그 등을 출력할 때 보기 쉽게 만들기 위함.
@@ -60,12 +60,40 @@ if __name__ == "__main__": # 테스트 코드
         m = p.search(stock_result)
 
         return True if m == None else False
+    
+    def cjmallCheck(res):    
+        from selenium import webdriver
 
+        path = "C:\\Users\\JY\\JYC\\Projects\\restock\\chromedriver.exe"
 
-    coupang = StockCheck("Q92"
-        , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
-        , coupangCheck, "utf-8")
-    stock = coupang.check()
-    print(coupang.name, "Available? ", stock)
-    (status_changed, last_status, current_status) = coupang.statusChanged()
-    print(coupang.name, "Status Changed? ", status_changed, ", Last Status? ", last_status, ", Current Status? ", current_status)
+        options = webdriver.ChromeOptions()
+        options.add_argument("headless")
+        options.add_argument("window-size=1920,1080")
+        driver = webdriver.Chrome(path, chrome_options=options)
+        driver.get('https://display.cjonstyle.com/p/item/77763438?channelCode=30001003')
+        driver.implicitly_wait(3)
+
+        try:
+            driver.find_element_by_class_name('_buy')
+            driver.implicitly_wait(3)
+            result = True
+        except:
+            result = False
+    
+        return True if result is True else False
+
+    # coupang = StockCheck("Q92"
+    #     , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
+    #     , coupangCheck, "utf-8")
+    # stock = coupang.check()
+    # print(coupang.name, "Available? ", stock)
+    # (status_changed, last_status, current_status) = coupang.statusChanged()
+    # print(coupang.name, "Status Changed? ", status_changed, ", Last Status? ", last_status, ", Current Status? ", current_status)
+
+    cjmall = StockCheck("Q92"
+        , "https://display.cjonstyle.com/p/item/77763438?channelCode=30001003"
+        , cjmallCheck, "utf-8")
+    stock = cjmall.check()
+    print(cjmall.name, "Available? ", stock)
+    (status_changed, last_status, current_status) = cjmall.statusChanged()
+    print(cjmall.name, "Status Changed? ", status_changed, ", Last Status? ", last_status, ", Current Status? ", current_status)

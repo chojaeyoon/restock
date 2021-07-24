@@ -1,6 +1,7 @@
 import configparser
-from bs4 import BeautifulSoup
 from restock import StockCheck
+from newstock_coupang_parts import coupangCheck
+from newstock_cjmall_parts import cjmallCheck
 from telegram_bot import TelegramBot
 from datetime import datetime
 import time
@@ -12,31 +13,18 @@ config.read('config.ini')
 # Initialize scraping classes
 # TODO Consider function to lambda
 
-def coupangCheck(res):    
-    soup = BeautifulSoup(res.text, 'html.parser')
-    stock_div = soup.find('div', class_='prod-not-find-known__buy__button')
-
-    if stock_div == None:
-        return True
-
-    stock_result = stock_div.text
-
-    import re # 정규표현식 내장함수
-
-    p = re.compile('품절')
-    m = p.search(stock_result)
-
-    return True if m == None else False
-
-
 # main script
 if __name__ == "__main__":
     bot = TelegramBot(config['TELEGRAM']['TOKEN'])
     bot.sendMessage(config['TELEGRAM']['RECEIVER_ID'], "Monitoring started.")
 
-    coupang = StockCheck("Q92"
-        , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
-        , coupangCheck, "utf-8")
+    # coupang = StockCheck("Q92"
+    #     , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
+    #     , coupangCheck, "utf-8")
+
+    cjmall = StockCheck("Q92"
+        , "https://display.cjonstyle.com/p/item/77766343?channelCode=30001003"
+        , cjmallCheck, "utf-8")
 
     sleep_mins = config['DEFAULT']['INTERVAL_MINS']
 
@@ -46,7 +34,7 @@ if __name__ == "__main__":
 
 
     while True:
-        returns = check([coupang])
+        returns = check([cjmall])
 
         print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), returns)
         

@@ -1,16 +1,17 @@
-def coupangCheck(res):
-            
-        soup = BeautifulSoup(res.text, 'html.parser')
-        stock_div = soup.find('div', class_='prod-not-find-known__buy__button')
+from bs4 import BeautifulSoup
 
-        if stock_div == None:
-            return True
+def coupangCheck(res):    
+    soup = BeautifulSoup(res.text, 'html.parser')
+    stock_div = soup.find('div', class_='prod-not-find-known__buy__button')
 
-        stock_result = stock_div.text
+    if stock_div == None:
+        return True
 
-        import re # 정규표현식 내장함수
+    stock_result = stock_div.text
 
-        p = re.compile('품절')
-        m = p.search(stock_result)
+    import re # 정규표현식 내장함수
 
-        return True if m == None else False
+    p = re.compile('품절')
+    m = p.search(stock_result)
+
+    return True if m == None else False
