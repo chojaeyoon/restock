@@ -18,13 +18,13 @@ if __name__ == "__main__":
     bot = TelegramBot(config['TELEGRAM']['TOKEN'])
     bot.sendMessage(config['TELEGRAM']['RECEIVER_ID'], "Monitoring started.")
 
-    # coupang = StockCheck("Q92"
-    #     , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
-    #     , coupangCheck, "utf-8")
+    coupang = StockCheck("Q92"
+        , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
+        , coupangCheck, "utf-8", "bs4")
 
     cjmall = StockCheck("Q92"
-        , "https://display.cjonstyle.com/p/item/77766343?channelCode=30001003"
-        , cjmallCheck, "utf-8")
+        , "https://display.cjonstyle.com/p/item/77763438?channelCode=30001003"
+        , cjmallCheck, "utf-8", "selenium")
 
     sleep_mins = config['DEFAULT']['INTERVAL_MINS']
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
 
     while True:
-        returns = check([cjmall])
+        returns = check([cjmall]) # Place to change
 
         print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), returns)
         

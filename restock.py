@@ -2,11 +2,12 @@ import requests
 
 class StockCheck: # StockCheck 클래스가 스크래핑 부분을 담당
 
-    def __init__(self, name, url, checkMethod, encoding):
+    def __init__(self, name, url, checkMethod, encoding, tool):
         self.name = name
         self.url = url
         self.checkMethod = checkMethod # 품절 여부를 체크하는 함수
         self.encoding = encoding
+        self.tool =  tool
         self.last_status = False # 최종 상태를 저장하기 위한 변수
 
 
@@ -21,12 +22,17 @@ class StockCheck: # StockCheck 클래스가 스크래핑 부분을 담당
 
 
     def check(self): # 가장 중요한 부분으로 getResponse 실행을 통해 응답을 가져오고 결과를 리턴
-        res = self.getResponse()
+        if self.tool == 'bs4':
+            res = self.getResponse()
 
-        if res.encoding != self.encoding: # 인코딩 관련 문제 방지를 위해 인코딩을 강제로 설정
-            res.encoding = self.encoding
+            if res.encoding != self.encoding: # 인코딩 관련 문제 방지를 위해 인코딩을 강제로 설정
+                res.encoding = self.encoding
 
-        return self.checkMethod(res) 
+            return self.checkMethod(res)        
+        
+        else :
+            return self.checkMethod(self.url)
+
 
     def statusChanged(self): # check 함수를 실행하여 상태가 바뀌었는지 체크하는 함수
         status = self.check()
@@ -42,35 +48,18 @@ class StockCheck: # StockCheck 클래스가 스크래핑 부분을 담당
         return "{} is {}".format(self.name, self.last_status)
 
 
-if __name__ == "__main__": # 테스트 코드
-    def coupangCheck(res):
-        from bs4 import BeautifulSoup
-        
-        soup = BeautifulSoup(res.text, 'html.parser')
-        stock_div = soup.find('div', class_='prod-not-find-known__buy__button')
+if __name__ == "__main__": # 테스트 코드    
+    from selenium import webdriver
 
-        if stock_div == None:
-            return True
-
-        stock_result = stock_div.text
-
-        import re # 정규표현식 내장함수
-
-        p = re.compile('품절')
-        m = p.search(stock_result)
-
-        return True if m == None else False
-    
-    def cjmallCheck(res):    
-        from selenium import webdriver
+    def cjmallCheck(url):    
 
         path = "C:\\Users\\JY\\JYC\\Projects\\restock\\chromedriver.exe"
 
         options = webdriver.ChromeOptions()
         options.add_argument("headless")
         options.add_argument("window-size=1920,1080")
-        driver = webdriver.Chrome(path, chrome_options=options)
-        driver.get('https://display.cjonstyle.com/p/item/77763438?channelCode=30001003')
+        driver = webdriver.Chrome(path, options=options)
+        driver.get(url)
         driver.implicitly_wait(3)
 
         try:
@@ -82,17 +71,9 @@ if __name__ == "__main__": # 테스트 코드
     
         return True if result is True else False
 
-    # coupang = StockCheck("Q92"
-    #     , "https://www.coupang.com/vp/products/4656360190?itemId=3421774698&vendorItemId=71408330401&q=q92+%EC%9E%90%EA%B8%89%EC%A0%9C&itemsCount=10&searchId=8fd9019b12b94853bf757113463d4119&rank=7"
-    #     , coupangCheck, "utf-8")
-    # stock = coupang.check()
-    # print(coupang.name, "Available? ", stock)
-    # (status_changed, last_status, current_status) = coupang.statusChanged()
-    # print(coupang.name, "Status Changed? ", status_changed, ", Last Status? ", last_status, ", Current Status? ", current_status)
-
     cjmall = StockCheck("Q92"
-        , "https://display.cjonstyle.com/p/item/77763438?channelCode=30001003"
-        , cjmallCheck, "utf-8")
+        , "https://display.cjonstyle.com/p/item/77766343?channelCode=30001003"
+        , cjmallCheck, "utf-8", "selenium")
     stock = cjmall.check()
     print(cjmall.name, "Available? ", stock)
     (status_changed, last_status, current_status) = cjmall.statusChanged()

@@ -1,13 +1,13 @@
 from selenium import webdriver
 
-def cjmallCheck(res):    
+def cjmallCheck(url):    
     path = "C:\\Users\\JY\\JYC\\Projects\\restock\\chromedriver.exe"
 
     options = webdriver.ChromeOptions()
     options.add_argument("headless")
     options.add_argument("window-size=1920,1080")
-    driver = webdriver.Chrome(path, chrome_options=options)
-    driver.get('https://display.cjonstyle.com/p/item/77766343?channelCode=30001003')
+    driver = webdriver.Chrome(path, options=options)
+    driver.get(url)
     driver.implicitly_wait(3)
     
     try:
