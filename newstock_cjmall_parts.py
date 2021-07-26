@@ -17,4 +17,6 @@ def cjmallCheck(url):
     except:
         result = False
     
+    driver.quit()
+    
     return True if result is True else False
